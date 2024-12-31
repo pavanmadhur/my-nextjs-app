@@ -19,36 +19,53 @@ export default function AdminContact() {
   const fetchData = async () => {
     const token = localStorage.getItem("auth");
     if (!token) {
+      console.error("No token found, redirecting to login");
       router.push("/admin");
+      return;
     }
-
+  
     try {
       const response = await fetch(
         `http://localhost:5000/api/v1/contacts/getallcontacts`,
         {
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json", // Ensure JSON header is set
           },
         }
       );
+  
+      if (response.status === 204) {
+        // Handle case when there's no content returned
+        console.log("No content returned");
+        setUserdata([]); // Optionally set empty data
+        return;
+      }
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+  
       const res = await response.json();
-
-      if (res.success === true) {
+      console.log("API Response:", res); // Debug API response
+  
+      if (res.success && Array.isArray(res.contacts)) {
         setUserdata(res.contacts);
+        setLoading(false); // Set loading to false after data is fetched
       } else {
+        console.error("Invalid data:", res);
         localStorage.removeItem("auth");
         router.push("/admin");
       }
     } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
+      console.error("Error fetching contacts:", error);
+      setLoading(false); // Ensure loading is set to false even in case of error
     }
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []); 
+  
+   
+  
 
 
 
@@ -134,9 +151,7 @@ export default function AdminContact() {
                       <th
                         key={colIndex}
                         className="border font-serif border-gray-200 px-4 py-2 text-left"
-                        {...column.getHeaderProps(
-                          column.getSortByToggleProps()
-                        )}
+                        {...column.getHeaderProps(column.getSortByToggleProps())}
                       >
                         {column.render("Header")}
                         <span>
@@ -210,4 +225,5 @@ export default function AdminContact() {
       )}
     </div>
   );
+
 }
