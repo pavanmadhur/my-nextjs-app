@@ -60,7 +60,7 @@ export default function ContactUs() {
         alignItems: "center",
         height: "90vh",
       }}
-    >
+    > 
       <div
         style={{
           backgroundColor: "#fff",

@@ -1,9 +1,11 @@
 "use client";
 import { useTable, useSortBy, usePagination } from "react-table";
 import { useMemo, useState, useEffect } from "react";
-import { ChevronDown, ChevronUp, Trash } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { CSVLink } from "react-csv";
+import { LogOut } from "lucide-react";
+
 const headers = [
   { label: "Name", key: "name" },
   { label: "Email", key: "email" },
@@ -31,44 +33,48 @@ export default function AdminContact() {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json", // Ensure JSON header is set
+            "Content-Type": "application/json",
           },
         }
       );
   
-      if (response.status === 204) {
-        // Handle case when there's no content returned
-        console.log("No content returned");
-        setUserdata([]); // Optionally set empty data
+      if (!response.ok) {
+        if (response.status === 401) {
+          console.error("Unauthorized, redirecting to login");
+          localStorage.removeItem("auth");
+          router.push("/admin");
+        } else {
+          console.error(`API request failed with status: ${response.status}`);
+        }
+        setUserdata([]); // Clear data on error
         return;
       }
   
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-  
       const res = await response.json();
-      console.log("API Response:", res); // Debug API response
+      console.log("API Response:", res);
   
-      if (res.success && Array.isArray(res.contacts)) {
-        setUserdata(res.contacts);
-        setLoading(false); // Set loading to false after data is fetched
+      // Ensure response contains valid data
+      if (res.success && Array.isArray(res.data)) {
+        setUserdata(res.data);
       } else {
-        console.error("Invalid data:", res);
-        localStorage.removeItem("auth");
-        router.push("/admin");
+        console.warn("Invalid or empty response data");
+        setUserdata([]); // Set empty data to avoid breaking the UI
       }
     } catch (error) {
       console.error("Error fetching contacts:", error);
-      setLoading(false); // Ensure loading is set to false even in case of error
+      setUserdata([]); // Clear data on error
+    } finally {
+      setLoading(false); // Ensure loading state is cleared
     }
   };
   
-   
+  
   
 
-
-
+  useEffect(() => {
+    fetchData();
+  }, []); // Ensure the API call runs only once when the component mounts
+  
   const data = useMemo(() => userdata, [userdata]);
 
   const columns = useMemo(
@@ -94,7 +100,7 @@ export default function AdminContact() {
     ],
     []
   );
-
+  
   const {
     getTableProps,
     getTableBodyProps,
@@ -117,113 +123,161 @@ export default function AdminContact() {
     useSortBy,
     usePagination
   );
-
+  
   return (
-    <div className="flex flex-col w-full p-4 mt-10">
-      {loading ? (
-        <div className="flex justify-center items-center h-screen">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-gray-900"></div>
-        </div>
-      ) : userdata.length === 0 ? (
-        <div className="flex m-auto font-serif">No data is available</div>
-      ) : (
-        <>
-          <div className="flex justify-end mb-4">
-            <CSVLink
-              data={userdata}
-              filename="ContactUsers.csv"
-              headers={headers}
-            >
-              <button className="bg-orange-500 font-serif text-white px-4 py-2 rounded-md hover:bg-orange-600">
-                Download CSV
-              </button>
-            </CSVLink>
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      {/* Header */}
+      <header
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "16px",
+        background: "linear-gradient(to right, #003973, #0074d9)", // Gradient background
+        fontWeight: "bold",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Shadow effect
+        color: "white",
+      }}
+    >
+      <h1
+        style={{
+          margin: 0,
+          fontSize: "24px", // Adjusted font size for the logo
+          fontWeight: "800", // Bold font weight for the logo
+        }}
+      >
+        Admin Dashboard
+      </h1>
+        
+      <div>
+            <LogOut
+              className="text-white h-8 w-8 cursor-pointer hover:text-gray-400"
+              onClick={() => {
+                localStorage.removeItem("auth");
+                router.push("/admin");
+              }}
+            />
           </div>
-          <div className="overflow-auto">
-            <table
-              className="table-auto w-full border-collapse border border-gray-200"
-              {...getTableProps()}
-            >
-              <thead className="bg-gray-100">
-                {headerGroups.map((headerGroup, index) => (
-                  <tr {...headerGroup.getHeaderGroupProps()} key={index}>
-                    {headerGroup.headers.map((column, colIndex) => (
-                      <th
-                        key={colIndex}
-                        className="border font-serif border-gray-200 px-4 py-2 text-left"
-                        {...column.getHeaderProps(column.getSortByToggleProps())}
-                      >
-                        {column.render("Header")}
-                        <span>
-                          {column.isSorted ? (
-                            column.isSortedDesc ? (
-                              <ChevronDown size={16} />
-                            ) : (
-                              <ChevronUp size={16} />
-                            )
-                          ) : null}
-                        </span>
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody {...getTableBodyProps()}>
-                {page.map((row, index) => {
-                  prepareRow(row);
-                  return (
-                    <tr {...row.getRowProps()} key={index}>
-                      {row.cells.map((cell, cellIndex) => (
-                        <td
-                          className="border font-serif border-gray-200 px-4 py-2"
-                          {...cell.getCellProps()}
-                          key={cellIndex}
+      </header>
+  
+      {/* Main Section */}
+      <main className="container mx-auto flex-grow px-6 py-8">
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+          </div>
+        ) : userdata.length === 0 ? (
+          <div className="flex justify-center items-center h-full text-gray-500 text-lg">
+            No data available
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            {/* Table Header */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-700">
+                Contact Users
+              </h2>
+              <CSVLink
+                data={userdata}
+                filename="ContactUsers.csv"
+                headers={headers}
+                className="px-4 py-2 bg-green-500 text-white rounded-md shadow hover:bg-green-600"
+              >
+                Download CSV
+              </CSVLink>
+            </div>
+  
+            {/* Table */}
+            <div className="overflow-x-auto">
+              <table className="min-w-full border-collapse border border-gray-200 text-sm">
+                <thead className="bg-blue-100">
+                  {headerGroups.map((headerGroup, index) => (
+                    <tr {...headerGroup.getHeaderGroupProps()} key={index}>
+                      {headerGroup.headers.map((column, colIndex) => (
+                        <th
+                          {...column.getHeaderProps(column.getSortByToggleProps())}
+                          key={colIndex}
+                          className="border-b border-gray-300 px-4 py-2 text-gray-600 font-semibold text-left"
                         >
-                          {cell.render("Cell")}
-                        </td>
+                          {column.render("Header")}
+                          <span className="ml-2">
+                            {column.isSorted ? (
+                              column.isSortedDesc ? (
+                                <ChevronDown size={16} />
+                              ) : (
+                                <ChevronUp size={16} />
+                              )
+                            ) : null}
+                          </span>
+                        </th>
                       ))}
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  ))}
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {page.map((row, index) => {
+                    prepareRow(row);
+                    return (
+                      <tr
+                        {...row.getRowProps()}
+                        key={index}
+                        className="hover:bg-blue-50 transition-colors"
+                      >
+                        {row.cells.map((cell, cellIndex) => (
+                          <td
+                            {...cell.getCellProps()}
+                            key={cellIndex}
+                            className="px-4 py-2 text-gray-700"
+                          >
+                            {cell.render("Cell")}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+  
+            {/* Pagination */}
+            <div className="flex justify-between items-center mt-6">
+              <div className="text-sm text-gray-500">
+                Page {pageIndex + 1} of {pageCount}
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => gotoPage(0)}
+                  disabled={!canPreviousPage}
+                  className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
+                >
+                  First
+                </button>
+                <button
+                  onClick={previousPage}
+                  disabled={!canPreviousPage}
+                  className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
+                >
+                  Prev
+                </button>
+                <button
+                  onClick={nextPage}
+                  disabled={!canNextPage}
+                  className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
+                >
+                  Next
+                </button>
+                <button
+                  onClick={() => gotoPage(pageCount - 1)}
+                  disabled={!canNextPage}
+                  className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
+                >
+                  Last
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="flex justify-center items-center mt-4 space-x-4">
-            <button
-              onClick={() => gotoPage(0)}
-              disabled={!canPreviousPage}
-              className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
-            >
-              First
-            </button>
-            <button
-              onClick={previousPage}
-              disabled={!canPreviousPage}
-              className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
-            >
-              Prev
-            </button>
-            <span>
-              Page {pageIndex + 1} of {pageCount}
-            </span>
-            <button
-              onClick={nextPage}
-              disabled={!canNextPage}
-              className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
-            >
-              Next
-            </button>
-            <button
-              onClick={() => gotoPage(pageCount - 1)}
-              disabled={!canNextPage}
-              className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
-            >
-              Last
-            </button>
-          </div>
-        </>
-      )}
+        )}
+      </main>
     </div>
   );
-
-}
+}  
