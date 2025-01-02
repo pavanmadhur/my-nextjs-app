@@ -7,7 +7,6 @@ import "react-toastify/dist/ReactToastify.css";
 export default function Page() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const submitHandler = async () => {
@@ -17,7 +16,6 @@ export default function Page() {
       if (password === "") newErrors.password = "Enter your password";
 
       if (Object.keys(newErrors).length === 0) {
-        setLoading(true);
         const response = await fetch(`http://localhost:5000/api/v1/admin/login`, {
           method: "POST",
           headers: {
@@ -34,7 +32,6 @@ export default function Page() {
         }
 
         const data = await response.json();
-        setLoading(false);
 
         if (data.token) {
           localStorage.setItem("auth", data.token);
@@ -46,7 +43,6 @@ export default function Page() {
         toast.error("Please fill in all fields.");
       }
     } catch (error) {
-      setLoading(false);
       toast.error("Failed to connect to the server. Please try again.");
     }
   };
@@ -69,7 +65,7 @@ export default function Page() {
           padding: "14px",
           borderRadius: "10px",
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-          width: "400px", // Adjust width as per design
+          width: "400px",
           textAlign: "center",
         }}
       >
