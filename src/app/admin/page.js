@@ -8,10 +8,6 @@ export default function Page() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [setError] = useState({
-    username: "",
-    password: "",
-  });
   const router = useRouter();
 
   const submitHandler = async () => {
@@ -19,8 +15,6 @@ export default function Page() {
       let newErrors = {};
       if (username === "") newErrors.username = "Enter Your username";
       if (password === "") newErrors.password = "Enter your password";
-
-      setError(newErrors);
 
       if (Object.keys(newErrors).length === 0) {
         setLoading(true);
@@ -48,6 +42,8 @@ export default function Page() {
         } else {
           toast.error(data.message || "Invalid credentials");
         }
+      } else {
+        toast.error("Please fill in all fields.");
       }
     } catch (error) {
       setLoading(false);
@@ -73,7 +69,7 @@ export default function Page() {
           padding: "14px",
           borderRadius: "10px",
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-          width: "400px",
+          width: "400px", // Adjust width as per design
           textAlign: "center",
         }}
       >
@@ -155,7 +151,7 @@ export default function Page() {
             cursor: "pointer",
           }}
         >
-          {loading ? "Loading..." : "Login"}
+          Login
         </button>
       </div>
     </div>
