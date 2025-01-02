@@ -7,12 +7,12 @@ import "react-toastify/dist/ReactToastify.css";
 export default function Page() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [setLoading] = useState(false);
-  const router = useRouter();
-  const [setError] = useState({
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState({
     username: "",
     password: "",
   });
+  const router = useRouter();
 
   const submitHandler = async () => {
     try {
@@ -21,6 +21,7 @@ export default function Page() {
       if (password === "") newErrors.password = "Enter your password";
 
       setError(newErrors);
+
       if (Object.keys(newErrors).length === 0) {
         setLoading(true);
         const response = await fetch(`http://localhost:5000/api/v1/admin/login`, {
@@ -56,108 +57,107 @@ export default function Page() {
 
   return (
     <div
-  className="flex justify-center items-center w-screen h-screen"
-  style={{
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100vw",
-    height: "100vh",
-    backgroundColor: "#F3F4F6",
-  }}
->
-  <div
-    style={{
-      backgroundColor: "#fff",
-      padding: "14px",
-      borderRadius: "10px",
-      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-      width: "400px", // Adjust width as per design
-      textAlign: "center",
-    }}
-  >
-    <h1
+      className="flex justify-center items-center w-screen h-screen"
       style={{
-        fontSize: "30px",
-        lineHeight: "1.2",
-        color: "#000",
-        marginBottom: "20px",
-        fontFamily: "Arial, sans-serif",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100vw",
+        height: "100vh",
+        backgroundColor: "#F3F4F6",
       }}
     >
-      Admin Login
-    </h1>
-    <div style={{ marginBottom: "20px" }}>
-      <label
-        htmlFor="username"
+      <div
         style={{
-          display: "block",
-          marginBottom: "5px",
-          fontSize: "14px",
-          fontWeight: "bold",
-          color: "#333",
+          backgroundColor: "#fff",
+          padding: "14px",
+          borderRadius: "10px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          width: "400px",
+          textAlign: "center",
         }}
       >
-        Username
-      </label>
-      <input
-        type="text"
-        id="username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        style={{
-          width: "90%",
-          padding: "10px",
-          marginBottom: "10px",
-          borderRadius: "5px",
-          border: "1px solid #ccc",
-        }}
-      />
+        <h1
+          style={{
+            fontSize: "30px",
+            lineHeight: "1.2",
+            color: "#000",
+            marginBottom: "20px",
+            fontFamily: "Arial, sans-serif",
+          }}
+        >
+          Admin Login
+        </h1>
+        <div style={{ marginBottom: "20px" }}>
+          <label
+            htmlFor="username"
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontSize: "14px",
+              fontWeight: "bold",
+              color: "#333",
+            }}
+          >
+            Username
+          </label>
+          <input
+            type="text"
+            id="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            style={{
+              width: "90%",
+              padding: "10px",
+              marginBottom: "10px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+            }}
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="password"
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontSize: "14px",
+              fontWeight: "bold",
+              color: "#333",
+            }}
+          >
+            Password
+          </label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{
+              width: "90%",
+              padding: "10px",
+              marginBottom: "20px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+            }}
+          />
+        </div>
+        <button
+          onClick={submitHandler}
+          style={{
+            width: "100%",
+            padding: "10px",
+            fontSize: "14px",
+            color: "#fff",
+            backgroundColor: "#007bff",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          {loading ? "Loading..." : "Login"}
+        </button>
+      </div>
     </div>
-    <div>
-      <label
-        htmlFor="password"
-        style={{
-          display: "block",
-          marginBottom: "5px",
-          fontSize: "14px",
-          fontWeight: "bold",
-          color: "#333",
-        }}
-      >
-        Password
-      </label>
-      <input
-        type="password"
-        id="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        style={{
-          width: "90%",
-          padding: "10px",
-          marginBottom: "20px",
-          borderRadius: "5px",
-          border: "1px solid #ccc",
-        }}
-      />
-    </div>
-    <button
-      onClick={submitHandler}
-      style={{
-        width: "100%",
-        padding: "10px",
-        fontSize: "14px",
-        color: "#fff",
-        backgroundColor: "#007bff",
-        border: "none",
-        borderRadius: "5px",
-        cursor: "pointer",
-      }}
-    >
-      Login
-    </button>
-  </div>
-</div>
-
   );
 }
