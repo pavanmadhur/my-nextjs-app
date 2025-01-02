@@ -7,44 +7,44 @@ import "react-toastify/dist/ReactToastify.css";
 export default function Page() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // Ensure this is used
   const router = useRouter();
 
   const submitHandler = async () => {
     try {
-      let newErrors = {};
-      if (username === "") newErrors.username = "Enter Your username";
-      if (password === "") newErrors.password = "Enter your password";
-
-      if (Object.keys(newErrors).length === 0) {
-        const response = await fetch(`http://localhost:5000/api/v1/admin/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            username,
-            password,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        if (data.token) {
-          localStorage.setItem("auth", data.token);
-          router.push("/admin/contacts");
-        } else {
-          toast.error(data.message || "Invalid credentials");
-        }
-      } else {
+      if (username === "" || password === "") {
         toast.error("Please fill in all fields.");
+        return;
+      }
+
+      setLoading(true);
+      const response = await fetch(`http://localhost:5000/api/v1/admin/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (data.token) {
+        localStorage.setItem("auth", data.token);
+        router.push("/admin/contacts");
+      } else {
+        toast.error(data.message || "Invalid credentials");
       }
     } catch (error) {
+      setLoading(false);
+      console.error(error); // Log the error for debugging purposes
       toast.error("Failed to connect to the server. Please try again.");
     }
+    
   };
 
   return (
@@ -146,8 +146,9 @@ export default function Page() {
             borderRadius: "5px",
             cursor: "pointer",
           }}
+          disabled={loading}
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
       </div>
     </div>
