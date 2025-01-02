@@ -8,7 +8,7 @@ export default function Page() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState({
+  const [setError] = useState({
     username: "",
     password: "",
   });
