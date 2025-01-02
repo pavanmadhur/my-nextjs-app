@@ -1,15 +1,15 @@
 "use client";
 import { useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Page() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [setLoading] = useState(false);
   const router = useRouter();
-  const [error, setError] = useState({
+  const [setError] = useState({
     username: "",
     password: "",
   });
