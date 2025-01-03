@@ -103,7 +103,6 @@ export default function AdminContact() {
 
         if (response.ok) {
             setUserdata((prev) => prev.filter((contact) => contact._id !== id));
-            alert("Contact deleted successfully!");
         } else {
             const errorData = await response.json();
             alert(`Error: ${errorData.message}`);
