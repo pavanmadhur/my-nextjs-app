@@ -15,35 +15,48 @@ export default function ContactUs() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    if (!formData.name || !formData.email || !formData.message) {
-      toast.error("All fields are required.");
-      return;
-    }
-  
-    const token = localStorage.getItem("auth");  // Get the token from localStorage (or any other storage)
+  const handleSubmit = async () => {
+    
   
     try {
-      const response = await fetch('http://localhost:5000/api/v1/contacts/addcontact', {
-        method: 'POST',
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+      const newErrors = {};
+      if (email.trim() !== "" && !emailRegex.test(email)) {
+        newErrors.email = "Email should be valid";
+      }
+      if (message.trim() === "") {
+        newErrors.message = "Message is required";
+      } else {
+        if (message.trim().length < 40) {
+          newErrors.message = "Message must be at least 40 characters.";
+        }
+      }
+      setErrors(newErrors);
+
+      if (Object.keys(newErrors).length === 0) {
+        setLoading(true);
+      const response = await fetch(
+        'http://localhost:5000/api/v1/contacts/addcontact', {
+        
+          method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,  // Add the token here if required
         },
         body: JSON.stringify(formData),
       });
   
-      const data = await response.json();
-      if (response.ok) {
+      const res = await response.json();
+      setLoading(false);
+      if (res.success === true) {
         toast.success("Message saved! We will contact you soon.");
         setFormData({ name: "", email: "", message: "" }); // Clear form
       } else {
-        toast.error(data.message || "Failed to send message. Please try again.");
+        toast.error("Please try after some time. Error occurred.");
       }
+    }
     } catch (error) {
-      toast.error("An error occurred. Please try again later.");
+      setLoading(true);
       console.error(error);
     }
   };

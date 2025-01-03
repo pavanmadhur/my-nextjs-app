@@ -16,7 +16,8 @@ export default function Page() {
         toast.error("Please fill in all fields.");
         return;
       }
-
+      setError(newErrors);
+      if (Object.keys(newErrors).length === 0) {
       setLoading(true);
       const response = await fetch(`http://localhost:5000/api/v1/admin/login`, {
         method: "POST",
@@ -24,11 +25,8 @@ export default function Page() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
       }
+    );
 
       const data = await response.json();
       setLoading(false);
@@ -39,11 +37,12 @@ export default function Page() {
       } else {
         toast.error("Invalid credentials");
       }
+    }
     } catch (error) {
       setLoading(false);
       console.error(error);
     }
-    
+  
   };
 
   return (

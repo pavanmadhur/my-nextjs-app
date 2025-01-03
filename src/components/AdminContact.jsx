@@ -28,52 +28,33 @@ export default function AdminContact() {
   const fetchData = async () => {
     const token = localStorage.getItem("auth");
     if (!token) {
-      console.error("No token found, redirecting to login");
       router.push("/admin");
-      return;
     }
   
     try {
       const response = await fetch(
         `http://localhost:5000/api/v1/contacts/getallcontacts`,
         {
-          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
           },
         }
       );
-  
-      if (!response.ok) {
-        if (response.status === 401) {
-          console.error("Unauthorized, redirecting to login");
-          localStorage.removeItem("auth");
-          router.push("/admin");
-        } else {
-          console.error(`API request failed with status: ${response.status}`);
-        }
-        setUserdata([]); // Clear data on error
-        return;
-      }
-  
       const res = await response.json();
-      console.log("API Response:", res);
-  
-      // Ensure response contains valid data
-      if (res.success && Array.isArray(res.data)) {
-        setUserdata(res.data);
+
+      if (res.success === true) {
+        setUserdata(res.contacts);
       } else {
-        console.warn("Invalid or empty response data");
-        setUserdata([]); // Set empty data to avoid breaking the UI
+        localStorage.removeItem("auth");
+        router.push("/admin");
       }
     } catch (error) {
-      console.error("Error fetching contacts:", error);
-      setUserdata([]); // Clear data on error
+      console.error(error);
     } finally {
-      setLoading(false); // Ensure loading state is cleared
+      setLoading(false);
     }
   };
+
   const handleDelete = async (id, event) => {
     if (event) {
         event.stopPropagation(); // Prevent the event from bubbling up
@@ -114,11 +95,6 @@ export default function AdminContact() {
 };
 
   
-  
-  
-  
-  
-
   useEffect(() => {
     fetchData();
   }, []); // Ensure the API call runs only once when the component mounts
