@@ -24,12 +24,6 @@ export default function ContactUs() {
       return;
     }
   
-    const token = localStorage.getItem("auth");
-    if (!token) {
-      toast.error("Authorization token is missing. Please log in.");
-      return;
-    }
-  
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/v1/contacts/addcontact`, {
         method: 'POST',
