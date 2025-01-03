@@ -17,6 +17,13 @@ export default function AdminContact() {
   const [userdata, setUserdata] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const handleDownloadSuccess = () => {
+    toast.success("CSV downloaded successfully!", {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+    });
+  };
 
   const fetchData = async () => {
     const token = localStorage.getItem("auth");
@@ -102,8 +109,6 @@ export default function AdminContact() {
   );
   
   const {
-    getTableProps,
-    getTableBodyProps,
     headerGroups,
     page,
     nextPage,
@@ -118,25 +123,28 @@ export default function AdminContact() {
     {
       columns,
       data,
-      initialState: { pageSize: 5 },
+      initialState: { pageSize: 7 },
     },
     useSortBy,
     usePagination
   );
   
-  return (
+  return ( 
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Header */}
       <header
       style={{
+        position: "fixed",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        padding: "16px",
+        padding: "10px",
         background: "linear-gradient(to right, #003973, #0074d9)", // Gradient background
         fontWeight: "bold",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Shadow effect
+        boxShadow: "0 3px 9px rgba(0, 0, 0, 0.1)", // Shadow effect
         color: "white",
+        width: "98%",
+        zIndex: 200,
       }}
     >
       <h1
@@ -161,123 +169,218 @@ export default function AdminContact() {
       </header>
   
       {/* Main Section */}
-      <main className="container mx-auto flex-grow px-6 py-8">
+      <section
+      id="ContactUsersTable"
+      style={{ padding: "40px 20px", backgroundColor: "#f9f9f9" }}
+    >
+       <h1
+        className="text-center font-bold"
+        style={{
+          fontSize: "28px",
+          lineHeight: "1.2",
+          color: "#000",
+          textAlign: "center",
+          marginBottom: "20px",
+        }}
+      >
+        Contact Users Table
+      </h1>
         {loading ? (
-          <div className="flex justify-center items-center h-full">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
-          </div>
+          <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "200px",
+          }}
+        >
+          <div
+            style={{
+              width: "40px",
+              height: "40px",
+              border: "4px solid #4a90e2",
+              borderTopColor: "transparent",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite",
+            }}
+          ></div>
+        </div>
         ) : userdata.length === 0 ? (
-          <div className="flex justify-center items-center h-full text-gray-500 text-lg">
-            No data available
-          </div>
+          <div
+          style={{
+            textAlign: "center",
+            color: "gray",
+            fontSize: "18px",
+            marginTop: "20px",
+          }}
+        >
+          No data available
+        </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-lg p-6">
+          <div
+          style={{
+            backgroundColor: "#fff",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            borderRadius: "8px",
+            padding: "24px",
+            margin: "0 auto",
+            maxWidth: "1200px",
+          }}
+        >
             {/* Table Header */}
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-700">
-                Contact Users
-              </h2>
-              <CSVLink
-                data={userdata}
-                filename="ContactUsers.csv"
-                headers={headers}
-                className="px-4 py-2 bg-green-500 text-white rounded-md shadow hover:bg-green-600"
-              >
-                Download CSV
-              </CSVLink>
-            </div>
+            <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "20px",
+            }}
+          >
+            <CSVLink
+              data={userdata}
+              headers={headers}
+              filename="ContactUsers.csv"
+              className="px-4 py-2"
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#4CAF50",
+                color: "#fff",
+                borderRadius: "8px",
+                textDecoration: "none",
+                cursor: "pointer",
+              }}
+              onClick={handleDownloadSuccess}
+            >
+              Download CSV
+            </CSVLink>
+          </div>
   
             {/* Table */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full border-collapse border border-gray-200 text-sm">
-                <thead className="bg-blue-100">
-                  {headerGroups.map((headerGroup, index) => (
-                    <tr {...headerGroup.getHeaderGroupProps()} key={index}>
-                      {headerGroup.headers.map((column, colIndex) => (
-                        <th
-                          {...column.getHeaderProps(column.getSortByToggleProps())}
-                          key={colIndex}
-                          className="border-b border-gray-300 px-4 py-2 text-gray-600 font-semibold text-left"
-                        >
-                          {column.render("Header")}
-                          <span className="ml-2">
-                            {column.isSorted ? (
-                              column.isSortedDesc ? (
-                                <ChevronDown size={16} />
-                              ) : (
-                                <ChevronUp size={16} />
-                              )
-                            ) : null}
-                          </span>
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {page.map((row, index) => {
-                    prepareRow(row);
-                    return (
-                      <tr
-                        {...row.getRowProps()}
-                        key={index}
-                        className="hover:bg-blue-50 transition-colors"
-                      >
-                        {row.cells.map((cell, cellIndex) => (
-                          <td
-                            {...cell.getCellProps()}
-                            key={cellIndex}
-                            className="px-4 py-2 text-gray-700"
-                          >
-                            {cell.render("Cell")}
-                          </td>
-                        ))}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-  
-            {/* Pagination */}
-            <div className="flex justify-between items-center mt-6">
-              <div className="text-sm text-gray-500">
-                Page {pageIndex + 1} of {pageCount}
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => gotoPage(0)}
-                  disabled={!canPreviousPage}
-                  className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
-                >
-                  First
-                </button>
-                <button
-                  onClick={previousPage}
-                  disabled={!canPreviousPage}
-                  className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
-                >
-                  Prev
-                </button>
-                <button
-                  onClick={nextPage}
-                  disabled={!canNextPage}
-                  className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
-                >
-                  Next
-                </button>
-                <button
-                  onClick={() => gotoPage(pageCount - 1)}
-                  disabled={!canNextPage}
-                  className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
-                >
-                  Last
-                </button>
-              </div>
-            </div>
+            <div style={{ overflowX: "auto" }}>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                textAlign: "left",
+              }}
+            >
+              <thead>
+  {headerGroups.map((headerGroup, headerGroupIndex) => (
+    <tr
+      {...headerGroup.getHeaderGroupProps()}
+      key={`header-group-${headerGroupIndex}`}
+      style={{ backgroundColor: "#f1f5f9" }}
+    >
+      {headerGroup.headers.map((column, columnIndex) => (
+        <th
+          {...column.getHeaderProps(column.getSortByToggleProps())}
+          key={`column-${columnIndex}`}
+          style={{
+            padding: "12px",
+            fontSize: "16px",
+            fontWeight: "600",
+            color: "#4a90e2",
+            borderBottom: "2px solid #e5e7eb",
+          }}
+        >
+          {column.render("Header")}
+          <span style={{ marginLeft: "8px" }}>
+            {column.isSorted ? (
+              column.isSortedDesc ? (
+                <ChevronDown size={16} />
+              ) : (
+                <ChevronUp size={16} />
+              )
+            ) : null}
+          </span>
+        </th>
+      ))}
+    </tr>
+  ))}
+</thead>
+
+<tbody>
+  {page.map((row, rowIndex) => {
+    prepareRow(row);
+    return (
+      <tr
+        {...row.getRowProps()}
+        key={`row-${row.original.id || rowIndex}`} // Use a unique value (e.g., `id`) or fallback to `rowIndex`
+        style={{
+          backgroundColor: "#fff",
+          transition: "background-color 0.3s",
+        }}
+        onMouseOver={(e) =>
+          (e.currentTarget.style.backgroundColor = "#f9fafb")
+        }
+        onMouseOut={(e) =>
+          (e.currentTarget.style.backgroundColor = "#fff")
+        }
+      >
+        {row.cells.map((cell, cellIndex) => (
+          <td
+            {...cell.getCellProps()}
+            key={`cell-${rowIndex}-${cellIndex}`} // Combine row and cell indices if no unique ID is available
+            style={{
+              padding: "12px",
+              fontSize: "14px",
+              color: "#4a4a4a",
+              borderBottom: "1px solid #e5e7eb",
+            }}
+          >
+            {cell.render("Cell")}
+          </td>
+        ))}
+      </tr>
+    );
+  })}
+</tbody>
+
+
+            </table>
           </div>
-        )}
-      </main>
-    </div>
+        </div>
+      )}
+    </section>
+            {/* Pagination */}
+            <div className="flex flex-col items-center mt-6"
+            style={{
+              textAlign: "center",
+            }}>
+  <div className="text-sm text-gray-500 mb-4">
+    Page {pageIndex + 1} of {pageCount}
+  </div>
+  <div className="flex space-x-2">
+    <button
+      onClick={() => gotoPage(0)}
+      disabled={!canPreviousPage}
+      className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
+    >
+      First
+    </button>
+    <button
+      onClick={previousPage}
+      disabled={!canPreviousPage}
+      className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
+    >
+      Prev
+    </button>
+    <button
+      onClick={nextPage}
+      disabled={!canNextPage}
+      className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
+    >
+      Next
+    </button>
+    <button
+      onClick={() => gotoPage(pageCount - 1)}
+      disabled={!canNextPage}
+      className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
+    >
+      Last
+    </button>
+  </div>
+</div>
+</div>
   );
-}  
+}
