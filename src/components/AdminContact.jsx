@@ -1,7 +1,7 @@
 "use client";
 import { useTable, useSortBy, usePagination } from "react-table";
 import { useMemo, useState, useEffect } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { CSVLink } from "react-csv";
 import { LogOut } from "lucide-react";
@@ -74,6 +74,48 @@ export default function AdminContact() {
       setLoading(false); // Ensure loading state is cleared
     }
   };
+  const handleDelete = async (id, event) => {
+    if (event) {
+        event.stopPropagation(); // Prevent the event from bubbling up
+    }
+    
+    if (!window.confirm("Are you sure you want to delete this contact?")) {
+        return;
+    }
+
+    try {
+        const token = localStorage.getItem("auth");
+
+        if (!token) {
+            alert("Authorization token not found. Please log in again.");
+            return;
+        }
+
+        const response = await fetch(
+            `http://localhost:5000/api/v1/contacts/deletecontact/${id}`,
+            {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+
+        if (response.ok) {
+            setUserdata((prev) => prev.filter((contact) => contact._id !== id));
+            alert("Contact deleted successfully!");
+        } else {
+            const errorData = await response.json();
+            alert(`Error: ${errorData.message}`);
+        }
+    } catch (error) {
+        console.error("Error deleting contact:", error);
+        alert("Failed to delete contact. Please try again.");
+    }
+};
+
+  
+  
   
   
   
@@ -103,6 +145,19 @@ export default function AdminContact() {
         Header: "Time",
         accessor: "createdAt",
         Cell: ({ value }) => new Date(value).toLocaleString(),
+      },
+      {
+        Header: "Actions",
+        Cell: ({ row }) => (
+          <Trash
+            style={{
+              color: "red",
+              cursor: "pointer",
+              fontSize: "10px",
+            }}
+            onClick={() => handleDelete(row.original._id)} // Pass contact ID to delete
+          />
+        ),
       },
     ],
     []
