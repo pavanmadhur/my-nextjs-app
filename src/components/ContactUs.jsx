@@ -18,18 +18,19 @@ export default function ContactUs() {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // Validate input fields
     if (!formData.name || !formData.email || !formData.message) {
       toast.error("All fields are required.");
       return;
     }
   
+    const token = localStorage.getItem("auth");  // Get the token from localStorage (or any other storage)
+  
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/v1/contacts/addcontact`, {
+      const response = await fetch('http://localhost:5000/api/v1/contacts/addcontact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Add the token here if required
+          'Authorization': `Bearer ${token}`,  // Add the token here if required
         },
         body: JSON.stringify(formData),
       });
@@ -40,14 +41,12 @@ export default function ContactUs() {
         setFormData({ name: "", email: "", message: "" }); // Clear form
       } else {
         toast.error(data.message || "Failed to send message. Please try again.");
-        console.error("Error:", data); // Log API error details
       }
     } catch (error) {
       toast.error("An error occurred. Please try again later.");
-      console.error("Network error:", error); // Log network or unexpected errors
+      console.error(error);
     }
   };
-  
   
 
   return (

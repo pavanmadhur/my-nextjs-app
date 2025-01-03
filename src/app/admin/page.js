@@ -33,16 +33,15 @@ export default function Page() {
       const data = await response.json();
       setLoading(false);
 
-      if (data.token) {
+      if (data.success === true) {
         localStorage.setItem("auth", data.token);
         router.push("/admin/contacts");
       } else {
-        toast.error(data.message || "Invalid credentials");
+        toast.error("Invalid credentials");
       }
     } catch (error) {
       setLoading(false);
-      console.error(error); // Log the error for debugging purposes
-      toast.error("Failed to connect to the server. Please try again.");
+      console.error(error);
     }
     
   };
