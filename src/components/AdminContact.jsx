@@ -398,44 +398,53 @@ export default function AdminContact() {
       )}
     </section>
             {/* Pagination */}
-            <div className="flex flex-col items-center mt-6"
-            style={{
-              textAlign: "center",
-            }}>
-  <div className="text-sm text-gray-500 mb-4">
+            <div
+  className="flex flex-col items-center mt-6"
+  style={{
+    textAlign: "center",
+  }}
+>
+  <div
+    className="text-sm text-black mb-4 font-medium"
+    style={{
+      fontSize: "14px",
+      fontWeight: "bold",
+    }}
+  >
     Page {pageIndex + 1} of {pageCount}
   </div>
   <div className="flex space-x-2">
     <button
       onClick={() => gotoPage(0)}
       disabled={!canPreviousPage}
-      className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
+      className="px-4 py-2 text-gray-500 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 disabled:bg-gray-200 disabled:cursor-not-allowed"
     >
       First
     </button>
     <button
       onClick={previousPage}
       disabled={!canPreviousPage}
-      className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
+      className="px-4 py-2 text-gray-500 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 disabled:bg-gray-200 disabled:cursor-not-allowed"
     >
       Prev
     </button>
     <button
       onClick={nextPage}
       disabled={!canNextPage}
-      className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
+      className="px-4 py-2 text-gray-500 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 disabled:bg-gray-200 disabled:cursor-not-allowed"
     >
       Next
     </button>
     <button
       onClick={() => gotoPage(pageCount - 1)}
       disabled={!canNextPage}
-      className="px-3 py-1 bg-gray-200 rounded-lg shadow hover:bg-gray-300 disabled:opacity-50"
+      className="px-4 py-2 text-gray-500 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-100 disabled:bg-gray-200 disabled:cursor-not-allowed"
     >
       Last
     </button>
   </div>
 </div>
+
 </div>
   );
 }
