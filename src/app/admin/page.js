@@ -12,37 +12,49 @@ export default function Page() {
 
   const submitHandler = async () => {
     try {
-      if (username === "" || password === "") {
-        toast.error("Please fill in all fields.");
-        return;
-      }
+      let newErrors = {};
+      if (username === "") newErrors.username = "Enter Your user name";
+      if (password === "") newErrors.password = "Enter your password";
+
       setError(newErrors);
       if (Object.keys(newErrors).length === 0) {
-      setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/v1/admin/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
+        setLoading(true);
+        const response = await fetch(
+          `https://localhost:5000/api/v1/contact/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              user_name: username,
+              password: password,
+            }),
+          }
+        );
+        const data = await response.json();
+        setLoading(false);
+        if (data.success === true) {
+          localStorage.setItem("auth", data.token);
+          router.push("/admin/contacts");
+        } else {
+          toast.error("Please Enter Valid Username and Password", {
+            position: "top-center",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            style: customToastStyle,
+          });
+          return;
+        }
       }
-    );
-
-      const data = await response.json();
-      setLoading(false);
-
-      if (data.success === true) {
-        localStorage.setItem("auth", data.token);
-        router.push("/admin/contacts");
-      } else {
-        toast.error("Invalid credentials");
-      }
-    }
     } catch (error) {
       setLoading(false);
-      console.error(error);
+      console.log(error);
     }
-  
   };
 
   return (

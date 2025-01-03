@@ -33,7 +33,7 @@ export default function AdminContact() {
   
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/contacts/getallcontacts`,
+        `http://localhost:5000/api/v1/contact/getallcontacts`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -56,48 +56,44 @@ export default function AdminContact() {
   };
 
   const handleDelete = async (id, event) => {
-    if (event) {
-        event.stopPropagation(); // Prevent the event from bubbling up
+    const token = localStorage.getItem("auth");
+    if (!token) {
+      router.push("/admin/login");
     }
-    
-    if (!window.confirm("Are you sure you want to delete this contact?")) {
-        return;
-    }
+    const confirmDelete = confirm(
+      "Are you sure you want to delete this contact?"
+    );
+    if (!confirmDelete) return;
 
     try {
-        const token = localStorage.getItem("auth");
-
-        if (!token) {
-            alert("Authorization token not found. Please log in again.");
-            return;
-        }
-
         const response = await fetch(
-            `http://localhost:5000/api/v1/contacts/deletecontact/${id}`,
+            `http://localhost:5000/api/v1/contact/deletecontact`,
             {
                 method: "DELETE",
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
                 },
+                body: JSON.stringify({
+                  userId: rowData._id,
+                }),
+              }
+            );
+            const res = await response.json();
+            if (res.success === true) {
+              setUserdata((prevUserData) =>
+                prevUserData.filter((user) => user._id !== rowData._id)
+              );
+            } else {
+              localStorage.removeItem("auth");
+              router.push("/admin");
             }
-        );
-
-        if (response.ok) {
-            setUserdata((prev) => prev.filter((contact) => contact._id !== id));
-        } else {
-            const errorData = await response.json();
-            alert(`Error: ${errorData.message}`);
-        }
-    } catch (error) {
-        console.error("Error deleting contact:", error);
-        alert("Failed to delete contact. Please try again.");
-    }
-};
-
+          } catch (error) {
+            console.error(error);
+          }
+        };
   
-  useEffect(() => {
-    fetchData();
-  }, []); // Ensure the API call runs only once when the component mounts
+// Ensure the API call runs only once when the component mounts
   
   const data = useMemo(() => userdata, [userdata]);
 
@@ -122,16 +118,15 @@ export default function AdminContact() {
         Cell: ({ value }) => new Date(value).toLocaleString(),
       },
       {
-        Header: "Actions",
+        Header: "Delete",
+        accessor: "delete",
         Cell: ({ row }) => (
-          <Trash
-            style={{
-              color: "red",
-              cursor: "pointer",
-              fontSize: "10px",
-            }}
-            onClick={() => handleDelete(row.original._id)} // Pass contact ID to delete
-          />
+          <button
+            className="text-red-500 hover:underline"
+            onClick={() => handleDelete(row.original)}
+          >
+            <Trash size={16} />
+          </button>
         ),
       },
     ],
