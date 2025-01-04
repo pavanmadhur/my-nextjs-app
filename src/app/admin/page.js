@@ -12,49 +12,39 @@ export default function Page() {
 
   const submitHandler = async () => {
     try {
-      let newErrors = {};
-      if (username === "") newErrors.username = "Enter Your user name";
-      if (password === "") newErrors.password = "Enter your password";
+      if (username === "" || password === "") {
+        toast.error("Please fill in all fields.");
+        return;
+      }
 
-      setError(newErrors);
-      if (Object.keys(newErrors).length === 0) {
-        setLoading(true);
-        const response = await fetch(
-          `https://localhost:5000/api/v1/contact/login`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              user_name: username,
-              password: password,
-            }),
-          }
-        );
-        const data = await response.json();
-        setLoading(false);
-        if (data.success === true) {
-          localStorage.setItem("auth", data.token);
-          router.push("/admin/contacts");
-        } else {
-          toast.error("Please Enter Valid Username and Password", {
-            position: "top-center",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            style: customToastStyle,
-          });
-          return;
-        }
+      setLoading(true);
+      const response = await fetch(`http://localhost:5000/api/v1/admin/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setLoading(false);
+
+      if (data.token) {
+        localStorage.setItem("auth", data.token);
+        router.push("/admin/contacts");
+      } else {
+        toast.error(data.message || "Invalid credentials");
       }
     } catch (error) {
       setLoading(false);
-      console.log(error);
+      console.error(error); // Log the error for debugging purposes
+      toast.error("Failed to connect to the server. Please try again.");
     }
+    
   };
 
   return (

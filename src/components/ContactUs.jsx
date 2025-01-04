@@ -18,12 +18,13 @@ export default function ContactUs() {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
+    // Validate form data
     if (!formData.name || !formData.email || !formData.message) {
       toast.error("All fields are required.");
       return;
     }
   
-    const token = localStorage.getItem("auth");  // Get the token from localStorage (or any other storage)
+    const token = localStorage.getItem("auth");  // Get the token from localStorage
   
     try {
       const response = await fetch('http://localhost:5000/api/v1/contacts/addcontact', {
@@ -47,6 +48,7 @@ export default function ContactUs() {
       console.error(error);
     }
   };
+  
   
 
   return (

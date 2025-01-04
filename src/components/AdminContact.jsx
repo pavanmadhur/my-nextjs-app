@@ -33,67 +33,92 @@ export default function AdminContact() {
   
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/contact/getallcontacts`,
+        `http://localhost:5000/api/v1/contacts/getallcontacts`, 
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
+  
+      if (!response.ok) {
+        if (response.status === 401) {
+          console.error("Unauthorized, redirecting to login");
+          localStorage.removeItem("auth");
+          router.push("/admin");
+        } else {
+          console.error(`API request failed with status: ${response.status}`);
+        }
+        setUserdata([]); // Clear data on error
+        return;
+      }
+  
       const res = await response.json();
+      console.log("API Response:", res); // Log the full response
 
-      if (res.success === true) {
-        setUserdata(res.contacts);
+      // Check for valid response
+      if (res.success && Array.isArray(res.data)) {
+        setUserdata(res.data);
       } else {
-        localStorage.removeItem("auth");
-        router.push("/admin");
+        console.warn("Invalid or empty response data:", res);
+        setUserdata([]); // Set empty data to avoid breaking the UI
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching contacts:", error);
+      setUserdata([]); // Clear data on error
     } finally {
-      setLoading(false);
+      setLoading(false); // Ensure loading state is cleared
     }
-  };
+};
 
   const handleDelete = async (id, event) => {
-    const token = localStorage.getItem("auth");
-    if (!token) {
-      router.push("/admin/login");
+    if (event) {
+        event.stopPropagation(); // Prevent the event from bubbling up
     }
-    const confirmDelete = confirm(
-      "Are you sure you want to delete this contact?"
-    );
-    if (!confirmDelete) return;
+    
+    if (!window.confirm("Are you sure you want to delete this contact?")) {
+        return;
+    }
 
     try {
+        const token = localStorage.getItem("auth");
+
+        if (!token) {
+            alert("Authorization token not found. Please log in again.");
+            return;
+        }
+
         const response = await fetch(
-            `http://localhost:5000/api/v1/contact/deletecontact`,
+            `http://localhost:5000/api/v1/contacts/deletecontact/${id}`,
             {
                 method: "DELETE",
                 headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({
-                  userId: rowData._id,
-                }),
-              }
-            );
-            const res = await response.json();
-            if (res.success === true) {
-              setUserdata((prevUserData) =>
-                prevUserData.filter((user) => user._id !== rowData._id)
-              );
-            } else {
-              localStorage.removeItem("auth");
-              router.push("/admin");
             }
-          } catch (error) {
-            console.error(error);
-          }
-        };
+        );
+
+        if (response.ok) {
+            setUserdata((prev) => prev.filter((contact) => contact._id !== id));
+        } else {
+            const errorData = await response.json();
+            alert(`Error: ${errorData.message}`);
+        }
+    } catch (error) {
+        console.error("Error deleting contact:", error);
+        alert("Failed to delete contact. Please try again.");
+    }
+};
+
   
-// Ensure the API call runs only once when the component mounts
+  
+  
+  
+  
+
+  useEffect(() => {
+    fetchData();
+  }, []); // Ensure the API call runs only once when the component mounts
   
   const data = useMemo(() => userdata, [userdata]);
 
@@ -118,15 +143,16 @@ export default function AdminContact() {
         Cell: ({ value }) => new Date(value).toLocaleString(),
       },
       {
-        Header: "Delete",
-        accessor: "delete",
+        Header: "Actions",
         Cell: ({ row }) => (
-          <button
-            className="text-red-500 hover:underline"
-            onClick={() => handleDelete(row.original)}
-          >
-            <Trash size={16} />
-          </button>
+          <Trash
+            style={{
+              color: "red",
+              cursor: "pointer",
+              fontSize: "10px",
+            }}
+            onClick={() => handleDelete(row.original._id)} // Pass contact ID to delete
+          />
         ),
       },
     ],
