@@ -29,15 +29,18 @@ export default function AdminContact() {
     const token = localStorage.getItem("auth");
     if (!token) {
       router.push("/admin");
-      return;
     }
   
     try {
-      const response = await fetch(`http://localhost:5000/api/v1/contacts/getallcontacts`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/v1/contacts/getallcontacts`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+
+          },
+        }
+      );
   
       if (!response.ok) {
         if (response.status === 401) {
@@ -54,11 +57,11 @@ export default function AdminContact() {
       const res = await response.json();
       console.log("API Response:", res);
   
-      // Check if response contains valid data
+      // Ensure response contains valid data
       if (res.success && Array.isArray(res.data)) {
         setUserdata(res.data);
       } else {
-        console.warn("Invalid or empty response data:", res);
+        console.warn("Invalid or empty response data");
         setUserdata([]); // Set empty data to avoid breaking the UI
       }
     } catch (error) {
@@ -67,9 +70,6 @@ export default function AdminContact() {
     } finally {
       setLoading(false); // Ensure loading state is cleared
     }
-  };
-  
-
   };
   const handleDelete = async (id, event) => {
     if (event) {
@@ -443,3 +443,4 @@ export default function AdminContact() {
 
 </div>
   );
+}
