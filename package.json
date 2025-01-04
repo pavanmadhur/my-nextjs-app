@@ -32,12 +32,5 @@
   },
   "rules": {
     "@typescript-eslint/no-unused-vars": "off"
-  },
-  "overrides": {
-  "react-table": {
-    "react": "^19.0.0"
   }
-}
-
-
 }
