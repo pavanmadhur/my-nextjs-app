@@ -33,7 +33,7 @@ export default function AdminContact() {
   
     try {
       const response = await fetch(
-        `https://contact-us-api-1.onrender.com/api/v1/contacts/getallcontacts`,
+        `http://localhost:5000/api/v1/contacts/getallcontacts`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -89,7 +89,7 @@ export default function AdminContact() {
         }
 
         const response = await fetch(
-            `https://contact-us-api-1.onrender.com/api/v1/contacts/deletecontact/${id}`,
+            `http://localhost:5000/api/v1/contacts/deletecontact/${id}`,
             {
                 method: "DELETE",
                 headers: {

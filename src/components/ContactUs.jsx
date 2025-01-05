@@ -27,7 +27,7 @@ export default function ContactUs() {
     const token = localStorage.getItem("auth");  // Get the token from localStorage
   
     try {
-      const response = await fetch('https://contact-us-api-1.onrender.com/api/v1/contacts/addcontact', {
+      const response = await fetch('http://localhost:5000/api/v1/contacts/addcontact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
