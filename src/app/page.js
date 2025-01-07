@@ -6,8 +6,6 @@ import Pricingplans from "@/components/Pricingplans";
 import ContactUs from "@/components/ContactUs";
 import Section from "@/components/Section";
 
-
-
 export default function Home() {
   return (
     <div>
@@ -19,15 +17,15 @@ export default function Home() {
           left: 0,
           width: "100%",
           zIndex: 1000,
-          backgroundColor: "#fff", // Add background color to avoid transparency
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)", // Optional: Add shadow for better visibility
+          backgroundColor: "#fff",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
         <Header />
       </div>
 
       {/* Main Content */}
-      <div style={{ marginTop: "80px" }}> {/* Add margin-top to avoid overlap with the fixed header */}
+      <div style={{ marginTop: "80px" }}>
         <center>
           <h1
             className="text-center font-bold mb-4"
@@ -44,7 +42,6 @@ export default function Home() {
           <p
             style={{
               margin: "0px 0px 32px",
-              
               textAlign: "center",
               fontWeight: "300",
               color: "gray",
@@ -56,9 +53,10 @@ export default function Home() {
           </p>
         </center>
 
-        <div> 
+        <div>
           <Section />
         </div>
+
         {/* Pricing Section */}
         <div>
           <Pricingplans />

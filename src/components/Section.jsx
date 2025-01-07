@@ -62,7 +62,7 @@ export default function Section() {
           >
             <div
               style={{
-                fontSize: "36px",
+                fontSize: "24px",
                 color: "#4a90e2",
                 marginBottom: "10px",
               }}
