@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 
 export default function Header() {
@@ -11,17 +12,18 @@ export default function Header() {
         justifyContent: "space-between",
         alignItems: "center",
         padding: "16px",
-        background: "linear-gradient(to right, #003973, #0074d9)", // Gradient background
-        fontWeight: "bold",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Shadow effect
+        background: "linear-gradient(to right, #003973, #0074d9)",
         color: "white",
+        position: "relative", // Necessary for dropdown positioning
+        zIndex: 1000,
       }}
     >
+      {/* Logo */}
       <h1
         style={{
           margin: 0,
-          fontSize: "24px", // Adjusted font size for the logo
-          fontWeight: "800", // Bold font weight for the logo
+          fontSize: "24px",
+          fontWeight: "800",
         }}
       >
         MicroConvert
@@ -30,11 +32,12 @@ export default function Header() {
       {/* Hamburger Menu */}
       <div
         style={{
-          display: "none", // Hidden by default
+          display: "none", // Default hidden for larger screens
           cursor: "pointer",
           fontSize: "24px",
         }}
         onClick={() => setMenuOpen(!menuOpen)}
+        className="hamburger-menu"
       >
         ☰
       </div>
@@ -42,13 +45,21 @@ export default function Header() {
       {/* Navigation Links */}
       <nav
         style={{
-          display: menuOpen ? "block" : "flex", // Flex for larger screens, block for mobile
-          flexDirection: menuOpen ? "column" : "row", // Column layout for mobile
-          gap: "1.5rem", // Space between links
+          display: menuOpen ? "block" : "flex",
+          flexDirection: menuOpen ? "column" : "row",
+          gap: "1.5rem",
+          position: menuOpen ? "absolute" : "static",
+          top: menuOpen ? "60px" : "auto",
+          right: menuOpen ? "16px" : "auto",
+          background: menuOpen ? "#003973" : "transparent",
+          padding: menuOpen ? "16px" : "0",
+          boxShadow: menuOpen ? "0 4px 8px rgba(0, 0, 0, 0.1)" : "none",
+          borderRadius: menuOpen ? "8px" : "none",
         }}
+        className="nav-links"
       >
         <a
-          href="#MicroConvert"
+          href="#features"
           style={{
             fontSize: "16px",
             color: "white",
@@ -69,7 +80,6 @@ export default function Header() {
             fontWeight: "500",
             cursor: "pointer",
             transition: "color 0.3s",
-            margin: menuOpen ? "8px 0" : "0 0 0 16px", // Adjust margin for mobile
           }}
         >
           Pricing
@@ -83,28 +93,21 @@ export default function Header() {
             fontWeight: "500",
             cursor: "pointer",
             transition: "color 0.3s",
-            margin: menuOpen ? "8px 0" : "0 0 0 16px", // Adjust margin for mobile
           }}
         >
           Contact
         </a>
       </nav>
 
-      {/* Styles for Responsiveness */}
+      {/* Media Query */}
       <style>
         {`
           @media (max-width: 768px) {
-            nav {
-              display: ${menuOpen ? "block" : "none"}; // Hide nav by default for small screens
-              position: absolute;
-              top: 60px; // Position below the header
-              right: 16px;
-              background: #003973; // Match the header background
-              padding: 8px;
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            .hamburger-menu {
+              display: block;
             }
-            div {
-              display: block; // Show hamburger menu on small screens
+            .nav-links {
+              display: ${menuOpen ? "block" : "none"};
             }
           }
         `}

@@ -17,8 +17,6 @@ export default function Home() {
           left: 0,
           width: "100%",
           zIndex: 1000,
-          backgroundColor: "#fff",
-          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
         }}
       >
         <Header />
@@ -28,11 +26,10 @@ export default function Home() {
       <div style={{ marginTop: "80px" }}>
         <center>
           <h1
-            className="text-center font-bold mb-4"
             style={{
               fontSize: "36px",
               lineHeight: "1.2",
-              margin: "0px 0px 16px",
+              margin: "16px 0",
               color: "#000",
             }}
           >
@@ -53,19 +50,11 @@ export default function Home() {
           </p>
         </center>
 
-        <div>
-          <Section />
-        </div>
+        <Section />
 
-        {/* Pricing Section */}
-        <div>
-          <Pricingplans />
-        </div>
+        <Pricingplans />
 
-        {/* Contact Section */}
-        <div>
-          <ContactUs />
-        </div>
+        <ContactUs />
       </div>
 
       <Footer />
