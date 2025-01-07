@@ -149,7 +149,7 @@ export default function AdminContact() {
             style={{
               color: "red",
               cursor: "pointer",
-              fontSize: "10px",
+              fontSize: "6px",
             }}
             onClick={() => handleDelete(row.original._id)} // Pass contact ID to delete
           />
